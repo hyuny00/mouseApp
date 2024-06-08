@@ -1,0 +1,8 @@
+dist/
+capture/
+build/
+*.json
+result.txt
+word.cvs
+words.pkl
+app.spec

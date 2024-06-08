@@ -4,13 +4,11 @@ import pyautogui
 import pyperclip
 import time
 import json  # For saving and loading history
-import pandas as pd
-import random
 from tkinter import messagebox, filedialog
 import threading
 from PIL import Image, ImageTk
 import os
-import pickle
+from mnemonic import Mnemonic
 
 # Global variable to store the color
 selected_color = ""
@@ -18,26 +16,28 @@ t = (0, 0)
 wordCount = 12
 
 
-def select_words(loaded_df):
+def select_words():
 
     global wordCount
 
-    """
-    df = pd.read_csv("word.cvs")
-    second_column = df.iloc[:, 1].str.strip()
-    random_entries = random.sample(list(second_column), wordCount)
-    random_entries_string = " ".join(random_entries)
+    # Initialize BIP-39 mnemonic generator
+    mnemo = Mnemonic("english")
 
-    str = random_entries_string
-    """
+    # Generate a 24-word seed phrase
+    if(wordCount == 12):
+        strength=128
+    elif (wordCount == 15):
+        strength=160
+    elif (wordCount == 18):
+        strength=192 
+    elif (wordCount == 21):
+        strength=224 
+    elif (wordCount == 24):
+        strength=256
 
-    num_rows = len(loaded_df)
+    seed_phrase = mnemo.generate(strength=strength)
 
-    random_indices = random.sample(range(num_rows), wordCount)
-    random_rows = loaded_df.iloc[random_indices]
-    result_string = " ".join(random_rows.iloc[:, 1])
-
-    return result_string
+    return seed_phrase
 
 
 # 이벤트 처리 함수
@@ -108,9 +108,6 @@ def long_running_task():
 
     global outer_running, inner_running, wordCount, isTest
 
-    with open("words.pkl", "rb") as f:
-        loaded_df = pickle.load(f)
-
     testCount = 0
     while outer_running:
 
@@ -152,7 +149,7 @@ def long_running_task():
 
                     wordCount = int(record["description"])
 
-                    result = select_words(loaded_df)
+                    result = select_words()
 
                     pyperclip.copy(result)
                     pyautogui.click(record["x"], record["y"])

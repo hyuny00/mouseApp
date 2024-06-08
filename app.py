@@ -16,6 +16,34 @@ t = (0, 0)
 wordCount = 12
 
 
+
+# 드래그 앤 드롭 기능 추가
+def on_drag_start(event):
+    widget = event.widget
+    index = widget.nearest(event.y)
+    widget.start_index = index
+
+def on_drag_motion(event):
+    widget = event.widget
+    index = widget.nearest(event.y)
+    if index < widget.size():
+        widget.activate(index)
+
+def on_drag_stop(event):
+    widget = event.widget
+    start_index = widget.start_index
+    end_index = widget.nearest(event.y)
+
+    if start_index != end_index:
+        # Reorder listbox items
+        item = widget.get(start_index)
+        widget.delete(start_index)
+        widget.insert(end_index, item)
+        
+        # Reorder records list
+        record = records.pop(start_index)
+        records.insert(end_index, record)
+
 def select_words():
 
     global wordCount
@@ -110,6 +138,8 @@ def long_running_task():
 
     testCount = 0
     while outer_running:
+        
+        print(len(records))
 
         if isTest:
             testCount = testCount + 1
@@ -139,9 +169,11 @@ def long_running_task():
             elif record["event"] == "sleep":
                 time.sleep(int(record["description"]))
             elif record["event"] == "Main Event":
-                print("Main Event Start:" + selected_color)
+                #print("Main Event Start:" + selected_color)
 
                 count = 0
+          
+               
                 while inner_running:
                     count = count + 1
                     if count % 100 == 0:
@@ -151,10 +183,24 @@ def long_running_task():
 
                     result = select_words()
 
+                    print(result)
+                    print(record["x"])
+                    print(record["y"])
                     pyperclip.copy(result)
                     pyautogui.click(record["x"], record["y"])
                     pyautogui.hotkey("ctrl", "v")
 
+                    time.sleep(1)
+
+                  
+                    
+                    with open("result.txt", "a") as file:
+                        file.write(result + "\n")
+
+                    inner_running = False
+
+
+                    """
                     screen = pyautogui.screenshot()
                     color = screen.getpixel(t)
                     hex_color = "#{:02x}{:02x}{:02x}".format(
@@ -169,7 +215,7 @@ def long_running_task():
                             file.write(result + "\n")
 
                         inner_running = False
-
+                    """
             elif record["event"] == "color":
                 # Finding color is a read operation, no action needed during replay
 
@@ -220,6 +266,8 @@ def on_mouse_button_release(event):
     description = description_entry.get()
     x, y = event.x_root, event.y_root  # Capture coordinates
     if description or selected_action in ["click", "color", "Main Event", "End Event"]:
+        
+        
         if selected_action == "color":
             screen = pyautogui.screenshot()
             color = screen.getpixel((x, y))
@@ -370,6 +418,10 @@ record_list = tk.Listbox(record_frame)
 record_list.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=5, pady=5)
 record_list.bind("<<ListboxSelect>>", on_record_list_select)
 
+record_list.bind("<Button-1>", on_drag_start)
+record_list.bind("<B1-Motion>", on_drag_motion)
+record_list.bind("<ButtonRelease-1>", on_drag_stop)
+
 button_frame = ttk.Frame(window)
 button_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
 
@@ -388,6 +440,7 @@ load_button = ttk.Button(
     button_frame, text="Load History", command=load_history, width=12
 )
 load_button.pack(side=tk.LEFT, padx=5)
+
 
 # 기록 저장 리스트
 records = []

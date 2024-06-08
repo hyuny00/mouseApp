@@ -97,7 +97,7 @@ root.title("RUN")
 
 # 고정 크기 설정
 root.geometry("400x400")
-root.resizable(False, False)
+#root.resizable(False, False)
 
 # 상단 프레임 (로드데이터 버튼과 파일명 표시)
 top_frame = tk.Frame(root)
@@ -194,7 +194,7 @@ def long_running_task():
             elif record["event"] == "sleep":
                 time.sleep(int(record["description"]))
             elif record["event"] == "Main Event":
-                print("Main Event Start:" + selected_color)
+                #print("Main Event Start:" + selected_color)
 
                 count = 0
                 while inner_running:
@@ -209,6 +209,9 @@ def long_running_task():
                     pyautogui.click(record["x"], record["y"])
                     pyautogui.hotkey("ctrl", "v")
 
+                    time.sleep(1)
+
+                    """
                     screen = pyautogui.screenshot()
                     color = screen.getpixel(t)
                     hex_color = "#{:02x}{:02x}{:02x}".format(
@@ -220,6 +223,13 @@ def long_running_task():
                             file.write(result + "\n")
 
                         inner_running = False
+                    """ 
+
+                    with open("result.txt", "a") as file:
+                        file.write(result + "\n")
+
+                    inner_running = False
+                    
             elif record["event"] == "color":
                 
                 screen = pyautogui.screenshot()

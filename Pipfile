@@ -5,6 +5,12 @@ name = "pypi"
 
 [packages]
 pyautogui = "*"
+pandas = "*"
+black = "*"
+pillow = "*"
+pip = "*"
+install = "*"
+mnemonic = "*"
 
 [dev-packages]
 

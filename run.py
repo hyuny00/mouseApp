@@ -36,7 +36,7 @@ def load_history():
   
 
 def on_start_button():
-
+    global outer_running, inner_running
     outer_running = True
     inner_running = True
 
@@ -99,7 +99,7 @@ wordCount=12
 outer_running = True
 inner_running = True
 
-def select_words(loaded_df):
+def select_words():
     
     global wordCount
 

@@ -269,7 +269,7 @@ def save_history():
     description = description_entry.get()
 
     if description == "":
-        messagebox.showerror("입력 오류", "입력은 정수여야 합니다.")
+        messagebox.showerror("입력 오류", "파일명을 입력하세요.")
         return
 
     history_file = "history_" + description + ".json"
